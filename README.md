@@ -1,0 +1,1 @@
+I wanted to learn and practice modeling spiking neurons with Brian 2 https://briansimulator.org/ and thought it would be fun to output the synthesized spike trains to sound instead of plots. This allows for both data sonification of simulated neurons and an interesting way to make music

@@ -9,14 +9,14 @@ area = 20000*umetre**2
 Cm = 1*ufarad*cm**-2 * area
 gl = 5e-5*siemens*cm**-2 * area
 El = -65*mV
-Ek = -90*mV
+EK = -90*mV
 ENa = 50*mV
 g_na = 100*msiemens*cm**-2 * area
 g_kd = 30*msiemens*cm**-2 * area
 VT = -63*mV
 
 eqs_HH = '''
-dv/dt = (gl*(El-v) - g_na*(m*m*m)*h*(v-ENa) - g_kd*(n*n*n*n)*(v-Ek) + I)/Cm : volt
+dv/dt = (gl*(El-v) - g_na*(m*m*m)*h*(v-ENa) - g_kd*(n*n*n*n)*(v-EK) + I)/Cm : volt
 dm/dt = 0.32*(mV**-1)*(13.*mV-v+VT)/
     (exp((13.*mV-v+VT)/(4.*mV))-1.)/ms*(1-m)-0.28*(mV**-1)*(v-VT-40.*mV)/
     (exp((v-VT-40.*mV)/(5.*mV))-1.)/ms*m : 1
