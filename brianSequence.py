@@ -118,44 +118,40 @@ eqs = '''
     dw/dt  = (a*(v - El) - w)/tau : amp
 '''# ...
 
-G = NeuronGroup(1, eqs, threshold='v > -40*mV', reset='vm = VR; w += b', method='euler', namespace=patterns['irregularSpiking']) #change namespace for different patterns in pattern dictionary
+G = NeuronGroup(1, eqs, threshold='v > 0*mV', reset='v = VR; w += b', method='euler', namespace=patterns['irregularSpiking']) #change namespace for different patterns in pattern dictionary
 
 G.v = -50*mV # would be better if it grabs the El value from whatever pattern is used in G namespace TODO lookup if NeuronGroup submodule allows to access individual namespace items
 G.w = 0
 
 spikemon = SpikeMonitor(G, variables='v')
-statemon = StateMonitor(G, ['v', 'w'], record=True)
+statemon = StateMonitor(G, ['v', 'w'], record=True, when='thresholds')
 
 #G.run_regularly('I = rand()*50*nA, dt=10*ms') # steady current probably instead of random, unless avant guard drum solo is desired
 defaultclock.dt = 0.1 * ms
-run(500*ms) # change this for different length tracks
+run(900*ms) # change this for different length tracks
 
 vs = np.clip(statemon[0].v / mV, a_min=None, a_max=0)
 
-for line in np.array(statemon.v[:][0]):
-    if type(line) == int:
-        print(line)
-    else:
-        continue
 
-print(line) #TODO find what's causing all the values to be NaNs -- I've tried changing the integration method but it does the same. Is it because I changed vm to v? the docs don't say what the difference is but the source looks for either 
+print(min(statemon.v[:][0]), max(statemon.v[:][0]))
+print(min(vs), max(vs))
 
-#rheobase = # voltage threshold of an action potential (spike)
-
+# clipped version is almost the same, unclipped is 0.80331727 instead of 0; using clipped just in case that number varies with different patterns, 0 is a good constant
 
 # set up pygame mixer and samples
 
-#pyg.mixer.init() #if there's lag, try pre_init()
+pyg.mixer.init() #if there's lag, try pre_init()
 
-#kick = pyg.mixer.Sound('./samples/808_Kick_Short.wav')
-#snare = pyg.mixer.Sound('./samples/808_Snare_2.wav')
-
+kick = pyg.mixer.Sound('samples/808_Kick_Short.wav')
+snare = pyg.mixer.Sound('samples/808_Snare_2.wav')
+hat = pyg.mixer.Sound('samples/808_Hat_Pedal.wav')
+conga = pyg.mixer.Sound('samples/808_Conga.wav')
 # link play events to spike threshold, or below threshold -- TODO add rest.wav for silence option, unless there's a better way to pause between events, maybe with the time module? pretty sure just adding 'continue' on the for loop would be way faster than a drum sample, and it would sound like just a bunch of drum samples in a row without the spike-pattern info
 
-#for i in np.array(statemon.v[:][0]):
- #   if i >= rheobase:
-   #     snare.play(i)
-  #  elif i < rheobase:
-    #    kick.play(i)
-
-
+for i in vs:
+    if i < 0:
+        kick.play(int())
+    elif i == 0:
+        conga.play()
+        snare.play()
+    time.sleep(0.01)
