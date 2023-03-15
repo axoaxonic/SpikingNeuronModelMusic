@@ -118,7 +118,7 @@ eqs = '''
     dw/dt  = (a*(v - El) - w)/tau : amp
 '''# ...
 
-G = NeuronGroup(1, eqs, threshold='v > 0*mV', reset='v = VR; w += b', method='euler', namespace=patterns['irregularSpiking']) #change namespace for different patterns in pattern dictionary
+G = NeuronGroup(1, eqs, threshold='v > 0*mV', reset='v = VR; w += b', method='euler', namespace=patterns['regularBursting']) #change namespace for different patterns in pattern dictionary
 
 G.v = -50*mV # would be better if it grabs the El value from whatever pattern is used in G namespace TODO lookup if NeuronGroup submodule allows to access individual namespace items
 G.w = 0
@@ -128,13 +128,13 @@ statemon = StateMonitor(G, ['v', 'w'], record=True, when='thresholds')
 
 #G.run_regularly('I = rand()*50*nA, dt=10*ms') # steady current probably instead of random, unless avant guard drum solo is desired
 defaultclock.dt = 0.1 * ms
-run(900*ms) # change this for different length tracks
+run(2000*ms) # change this for different length tracks
 
 vs = np.clip(statemon[0].v / mV, a_min=None, a_max=0)
 
 
 print(min(statemon.v[:][0]), max(statemon.v[:][0]))
-print(min(vs), max(vs))
+print(set([int(i) for i in vs]))
 
 # clipped version is almost the same, unclipped is 0.80331727 instead of 0; using clipped just in case that number varies with different patterns, 0 is a good constant
 
@@ -144,14 +144,24 @@ pyg.mixer.init() #if there's lag, try pre_init()
 
 kick = pyg.mixer.Sound('samples/808_Kick_Short.wav')
 snare = pyg.mixer.Sound('samples/808_Snare_2.wav')
-hat = pyg.mixer.Sound('samples/808_Hat_Pedal.wav')
+hat = pyg.mixer.Sound('samples/808_Hat_Closed.wav')
 conga = pyg.mixer.Sound('samples/808_Conga.wav')
+clap = pyg.mixer.Sound('samples/808_Clap.wav')
+shake = pyg.mixer.Sound('samples/808_Shaker.wav')
+clave = pyg.mixer.Sound('samples/808_Clave.wav')
+crash = pyg.mixer.Sound('samples/808_Cymbal.wav')
+
+
 # link play events to spike threshold, or below threshold -- TODO add rest.wav for silence option, unless there's a better way to pause between events, maybe with the time module? pretty sure just adding 'continue' on the for loop would be way faster than a drum sample, and it would sound like just a bunch of drum samples in a row without the spike-pattern info
 
 for i in vs:
-    if i < 0:
-        kick.play(int())
-    elif i == 0:
-        conga.play()
+    if i > -20 < -1:
         snare.play()
+        crash.play()
+    elif i > -50 < -21:
+        kick.play()
+        shake.play()
+    elif i >= -1: # not many 0s
+        conga.play(3)
     time.sleep(0.01)
+
