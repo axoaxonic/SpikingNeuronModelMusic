@@ -118,7 +118,7 @@ eqs = '''
     dw/dt  = (a*(v - El) - w)/tau : amp
 '''# ...
 
-G = NeuronGroup(1, eqs, threshold='v > 0*mV', reset='v = VR; w += b', method='euler', namespace=patterns['regularBursting']) #change namespace for different patterns in pattern dictionary
+G = NeuronGroup(1, eqs, threshold='v > 0*mV', reset='v = VR; w += b', method='euler', namespace=patterns['delayedRegularBursting']) #change namespace for different patterns in pattern dictionary
 
 G.v = -50*mV # would be better if it grabs the El value from whatever pattern is used in G namespace TODO lookup if NeuronGroup submodule allows to access individual namespace items
 G.w = 0
